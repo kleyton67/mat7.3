@@ -1,8 +1,9 @@
-![Python package](https://github.com/skjerns/mat7.3/workflows/Python%20package/badge.svg)  ![pypi Version](https://img.shields.io/pypi/v/mat73)
-
 # mat 7.3
 
+[Fork from mat 7.3](https://github.com/skjerns/mat7.3)
 Load MATLAB 7.3 .mat files into Python.
+
+This package just removed logs, it is using the last version of skjerns package (2022-11-21).
 
 Starting with MATLAB 7.3, `.mat` files have been changed to store as custom `hdf5` files.
 This means they cannot be loaded by `scipy.io.loadmat` any longer and raise.

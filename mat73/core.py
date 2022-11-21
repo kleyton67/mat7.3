@@ -49,7 +49,7 @@ class HDF5Decoder():
         if isinstance(only_include, str):
             only_include = [only_include]
         if only_include is not None:
-            only_include = [s if s[0]=='/' else f'/{s}' for s in only_include]
+            only_include = [s if s[0]=='/' else '/{}'.format(s) for s in only_include]
             only_include = [s[:-1] if s[-1]=='/' else s for s in only_include]
         self.verbose = verbose
         self._dict_class = AttrDict if use_attrdict else dict
@@ -92,8 +92,8 @@ class HDF5Decoder():
         if self.only_include is not None:
             for var, found in self._found_include_var.items():
                 if not found:
-                    logging.warning(f'Variable "{var}" was specified to be loaded'\
-                                  ' but could not be found.')
+                    logging.warning('Variable {} was specified to be loaded'\
+                                  ' but could not be found.'.format(var))
             if not any(list(self._found_include_var.values())):
                 print(hdf5.filename, 'contains the following vars:')
                 hdf5.visit(print_tree)
@@ -134,16 +134,15 @@ class HDF5Decoder():
                         n_cols = len(col_ind) - 1
                         unpacked = csc_matrix((data, row_ind, col_ind), shape=(n_rows, n_cols))
                     except ModuleNotFoundError:
-                        logging.error(f'`scipy` not installed. To load the sparse matrix'
-                                      f' `{elem.name}`,'
-                                      ' you need to have scipy installed. Please install'
-                                      ' via `pip install scipy`')
+                        logging.error("""scipy not installed. To load the sparse matrix {}
+                                      you need to have scipy installed. Please install
+                                      via pip install scipy""".format(elem.name))
                     except DeprecationWarning:
-                        logging.error(f'Tried loading the sparse matrix `{elem.name}`'
-                                      ' with scipy, but'
-                                      ' the interface has been deprecated. Please'
-                                      ' raise this error as an issue on GitHub:'
-                                      ' https://github.com/skjerns/mat7.3/issues')
+                        logging.error("""Tried loading the sparse matrix
+                                       with scipy, but
+                                      the interface has been deprecated. Please
+                                      raise this error as an issue on GitHub:
+                                      https://github.com/skjerns/mat7.3/issues""".format())
                         
 
                 elif MATLAB_class=='struct' and len(elem)>1 and \
@@ -178,7 +177,7 @@ class HDF5Decoder():
             if  self.is_included(hdf5):
                 return self.convert_mat(hdf5, depth, MATLAB_class=MATLAB_class)
         else:
-            raise Exception(f'Unknown hdf5 type: {key}:{type(hdf5)}')
+            raise Exception('Unknown hdf5 type: {}:{}'.format(key, type(hdf5)))
     
     # @profile
     def _has_refs(self, dataset):
@@ -311,14 +310,14 @@ def loadmat(filename, use_attrdict=False, only_include=None, verbose=True):
     ext = os.path.splitext(filename)[1].lower()
     if ext!='.mat':
         logging.warning('Can only load MATLAB .mat file, this file type might '
-                        f'be unsupported: {filename}')
+                        'be unsupported: {}'.format(filename))
     try:
         with h5py.File(filename, 'r') as hdf5:
             dictionary = decoder.mat2dict(hdf5)
         return dictionary
     except OSError:
-        raise TypeError('{} is not a MATLAB 7.3 file. '\
-                        'Load with scipy.io.loadmat() instead.'.format(filename))
+        raise TypeError("""{} is not a MATLAB 7.3 file. 
+                        Load with scipy.io.loadmat() instead.""".format(filename))
             
             
 def savemat(filename, verbose=True):
